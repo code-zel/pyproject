@@ -20,9 +20,45 @@ firefox_option.set_preference('general.useragent.override', user_agent)
 browser = webdriver.Firefox(service=firefox_service, options=firefox_option)
 browser.implicitly_wait(7)
 
-url = 'https://atlanta.craigslist.org/'
+url = 'https://atlanta.craigslist.org/search/cta'
 browser.get(url)
+time.sleep(3)
 
 
 # click a hyperlink
-for_sale_element = browser.find_element(By.XPATH, "/html/body/div[1]/section/div[3]/div[3]/div[2]/div/ul[1]/li[16]/a")
+searchbar = browser.find_element(By.XPATH, "/html/body/div[1]/main/form/div[1]/div/div/input")
+searchbar.send_keys('honda')
+time.sleep(5)
+enter_button = browser.find_element(By.XPATH, "/html/body/div[1]/main/form/div[1]/button[1]")
+enter_button.click()
+time.sleep(3)
+
+#store listings into csv
+posts_html = []
+x=0
+while x<4:
+    search_results = browser.find_element(By.ID, "search-results-page-1")
+    soup = BeautifulSoup(search_results.get_attribute('innerHTML'), 'html.parser')
+    posts_html.extend(soup.find_all('li', {'class': 'cl-search-view-mode-gallery'}))
+    button_next = browser.find_element(By.CLASS_NAME, "cl-next-page")
+    button_next.click()
+    time.sleep(1.5)
+    x=x+1
+
+print(len(posts_html))
+
+# now lets clean up pur results
+
+post = namedtuple('post', ['title', 'price', 'date'])
+posts = []
+
+for post_html in posts_html:
+    title = post_html.find('a', 'titlestring').text
+    price = browser.find_element(By.CLASS_NAME, "priceinfo").get_attribute("textContent")
+    date = post_html.find()
+    posts.append(post(title, price, date))
+
+print(posts[2])
+
+
+
