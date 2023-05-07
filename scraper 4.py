@@ -12,6 +12,8 @@ from selenium.common.exceptions import ElementNotInteractableException
 from bs4 import BeautifulSoup
 import pandas as pd
 
+#info needed for selenium 
+
 user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/112.0"
 firefox_driver_path = os.path.join(os.getcwd(), 'geckodriver.exe')
 firefox_service = Service(firefox_driver_path)
@@ -20,6 +22,7 @@ firefox_option.set_preference('general.useragent.override', user_agent)
 browser = webdriver.Firefox(service=firefox_service, options=firefox_option)
 browser.implicitly_wait(7)
 
+#opening the browser to desired page 
 url = 'https://atlanta.craigslist.org/search/cta'
 browser.get(url)
 time.sleep(3)
@@ -33,7 +36,7 @@ enter_button = browser.find_element(By.XPATH, "/html/body/div[1]/main/form/div[1
 enter_button.click()
 time.sleep(3)
 
-#store listings into csv
+#creating the list of results, querying first 4 pages of listings
 posts_html = []
 x=0
 while x<4:
@@ -45,23 +48,30 @@ while x<4:
     time.sleep(1.5)
     x=x+1
 
-print(len(posts_html))
+# test line used to make sure we are populating the list: print(len(posts_html))
 
-# now lets clean up our results
+# now lets clean up our results into attributes
 
 post = namedtuple('post', ['title', 'price', 'date', 'miles', 'location', 'post_url'])
 posts = []
 
 for post_html in posts_html:
     title = post_html.find('a', 'titlestring').text
-    price = browser.find_element(By.CLASS_NAME, "priceinfo").get_attribute("textContent")
+    price = post_html.find('div', 'gallery-card').contents[3].text
     date = post_html.find('div', 'meta').contents[0]
     miles = post_html.find('div', 'meta').contents[2]
     location = post_html.find('div', 'meta').contents[-1]
     post_url = post_html.find('a', 'titlestring').get('href')
     posts.append(post(title, price, date, miles, location, post_url))
 
-print(posts[-5])
+# test line print(posts[-5])
+
+#create csv file
+
+df = pd.DataFrame(posts)
+df.to_csv(f'results ({datetime.datetime.now().strftime("%Y_%m_%d %H_%M_%S")}).csv', index=False)
+
+browser.close()
 
 
 
