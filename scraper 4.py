@@ -12,6 +12,9 @@ from selenium.common.exceptions import ElementNotInteractableException
 from bs4 import BeautifulSoup
 import pandas as pd
 
+#user input for what car they would like to search for
+car = input("What type of car are you looking for?")
+
 #info needed for selenium 
 
 user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/112.0"
@@ -30,7 +33,7 @@ time.sleep(3)
 
 # click a hyperlink
 searchbar = browser.find_element(By.XPATH, "/html/body/div[1]/main/form/div[1]/div/div/input")
-searchbar.send_keys('honda')
+searchbar.send_keys(car)
 time.sleep(5)
 enter_button = browser.find_element(By.XPATH, "/html/body/div[1]/main/form/div[1]/button[1]")
 enter_button.click()
