@@ -47,18 +47,21 @@ while x<4:
 
 print(len(posts_html))
 
-# now lets clean up pur results
+# now lets clean up our results
 
-post = namedtuple('post', ['title', 'price', 'date'])
+post = namedtuple('post', ['title', 'price', 'date', 'miles', 'location', 'post_url'])
 posts = []
 
 for post_html in posts_html:
     title = post_html.find('a', 'titlestring').text
     price = browser.find_element(By.CLASS_NAME, "priceinfo").get_attribute("textContent")
-    date = post_html.find()
-    posts.append(post(title, price, date))
+    date = post_html.find('div', 'meta').contents[0]
+    miles = post_html.find('div', 'meta').contents[2]
+    location = post_html.find('div', 'meta').contents[-1]
+    post_url = post_html.find('a', 'titlestring').get('href')
+    posts.append(post(title, price, date, miles, location, post_url))
 
-print(posts[2])
+print(posts[-5])
 
 
 
